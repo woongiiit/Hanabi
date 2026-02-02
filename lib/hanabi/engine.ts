@@ -117,6 +117,13 @@ export function reduce(state: GameState | null, action: GameAction): GameState {
   const s: GameState = structuredClone(state);
   s.version = state.version + 1;
 
+  if (action.type === "SET_PLAYER_NAME") {
+    const { playerId, name } = action.payload;
+    s.players = s.players.map((p) => (p.id === playerId ? { ...p, name } : p));
+    addLog(s, `${playerId} 닉네임 변경: ${name}`, action.t);
+    return s;
+  }
+
   if (action.type === "SET_NAMES") {
     const names = action.payload.names;
     s.players = s.players.map((p, i) => ({ ...p, name: names[i] ?? p.name }));

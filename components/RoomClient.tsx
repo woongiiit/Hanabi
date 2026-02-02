@@ -7,6 +7,8 @@ import { useGameStore } from "@/store/gameStore";
 import type { PlayerId } from "@/lib/hanabi/types";
 import { GameBoard } from "@/components/game/GameBoard";
 import { useRoomSync } from "@/lib/realtime/useRoomSync";
+import { useProfileStore } from "@/store/profileStore";
+import { useAdvertiseRoom } from "@/lib/lobby/useAdvertiseRoom";
 
 function asPlayerId(v: string | null): PlayerId {
   if (!v) return "P1";
@@ -15,27 +17,52 @@ function asPlayerId(v: string | null): PlayerId {
   return "P1";
 }
 
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
 export function RoomClient({ roomId }: { roomId: string }) {
   const sp = useSearchParams();
   const modeParam = sp.get("mode");
   const meParam = sp.get("me");
+  const pcParam = sp.get("pc");
+  const titleParam = sp.get("title");
   const mode = modeParam === "online" ? "online" : "local";
   const me = asPlayerId(meParam);
+  const playerCount = clamp(Number(pcParam ?? "2") || 2, 2, 5);
+  const roomTitle = (titleParam ? decodeURIComponent(titleParam) : "") || roomId;
 
-  const { initRoom, setViewerId, viewerId, state, reset } = useGameStore();
+  const { initRoom, setViewerId, viewerId, state, reset, dispatch } = useGameStore();
+  const { nickname } = useProfileStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    initRoom(roomId, mode, 2);
+    initRoom(roomId, mode, playerCount);
     setViewerId(me);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, modeParam, meParam]);
+  }, [roomId, modeParam, meParam, playerCount]);
 
   const playerOptions = useMemo(() => (state?.players ?? []).map((p) => p.id), [state?.players]);
 
   const sync = useRoomSync(roomId, mode === "online");
+
+  useEffect(() => {
+    if (!nickname) return;
+    dispatch({ type: "SET_PLAYER_NAME", payload: { playerId: me, name: nickname } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nickname, me]);
+
+  const roomSummary = useMemo(
+    () =>
+      mode === "online"
+        ? { id: roomId, title: roomTitle, playerCount, createdAt: state?.createdAt ?? Date.now(), mode: "online" as const }
+        : null,
+    [mode, roomId, roomTitle, playerCount, state?.createdAt]
+  );
+
+  useAdvertiseRoom(roomSummary, mode === "online" && viewerId === "P1");
 
   if (!mounted) return null;
 
@@ -46,7 +73,7 @@ export function RoomClient({ roomId }: { roomId: string }) {
         <div className="glass flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="text-xs uppercase tracking-widest text-slate-300/80">Room</div>
-            <div className="truncate text-lg font-semibold">{roomId}</div>
+            <div className="truncate text-lg font-semibold">{roomTitle}</div>
             <div className="mt-1 text-xs text-slate-200/70">
               공유 URL: <code className="rounded bg-white/10 px-1">/room/{roomId}?me=P2</code>
             </div>

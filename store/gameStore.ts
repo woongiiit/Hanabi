@@ -12,6 +12,7 @@ type WithMeta<T extends GameAction> = Omit<T, "id" | "t"> & { id?: string; t?: n
 type DispatchInput =
   | WithMeta<Extract<GameAction, { type: "START" }>>
   | WithMeta<Extract<GameAction, { type: "SET_NAMES" }>>
+  | WithMeta<Extract<GameAction, { type: "SET_PLAYER_NAME" }>>
   | WithMeta<Extract<GameAction, { type: "GIVE_HINT" }>>
   | WithMeta<Extract<GameAction, { type: "PLAY_CARD" }>>
   | WithMeta<Extract<GameAction, { type: "DISCARD_CARD" }>>;

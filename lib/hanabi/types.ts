@@ -52,6 +52,7 @@ export type HintKind = "color" | "rank";
 export type GameAction =
   | { id: string; t: number; type: "START"; payload: { roomId: string; playerCount: number; names?: string[]; seed?: number } }
   | { id: string; t: number; type: "SET_NAMES"; payload: { names: string[] } }
+  | { id: string; t: number; type: "SET_PLAYER_NAME"; payload: { playerId: PlayerId; name: string } }
   | { id: string; t: number; type: "GIVE_HINT"; actor: PlayerId; payload: { to: PlayerId; kind: HintKind; value: Color | Rank } }
   | { id: string; t: number; type: "PLAY_CARD"; actor: PlayerId; payload: { index: number } }
   | { id: string; t: number; type: "DISCARD_CARD"; actor: PlayerId; payload: { index: number } };
