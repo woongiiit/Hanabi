@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { NightSky } from "@/components/NightSky";
@@ -16,7 +16,7 @@ export function CreateRoomClient() {
   const mode = (sp.get("mode") === "local" ? "local" : "online") as "online" | "local";
 
   const { nickname } = useProfileStore();
-  const hasSupabase = useMemo(() => Boolean(getSupabaseClient()), []);
+  const hasSupabase = Boolean(getSupabaseClient());
   const effectiveMode = mode === "online" && hasSupabase ? "online" : "local";
 
   const [title, setTitle] = useState("새 방");

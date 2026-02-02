@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { NightSky } from "@/components/NightSky";
 import { useProfileStore } from "@/store/profileStore";
@@ -14,7 +13,7 @@ export function JoinRoomClient() {
   const requestedMode = modeParam === "local" ? "local" : "online";
 
   const { nickname, preferredMode } = useProfileStore();
-  const hasSupabase = useMemo(() => Boolean(getSupabaseClient()), []);
+  const hasSupabase = Boolean(getSupabaseClient());
   const mode = preferredMode === "auto" ? (hasSupabase ? "online" : "local") : preferredMode;
   const effectiveMode = requestedMode === "online" && mode === "online" && hasSupabase ? "online" : "local";
 

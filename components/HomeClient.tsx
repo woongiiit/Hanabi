@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { NightSky } from "@/components/NightSky";
 import { useProfileStore } from "@/store/profileStore";
@@ -11,7 +11,7 @@ export function HomeClient() {
   const { nickname, setNickname, preferredMode, setPreferredMode } = useProfileStore();
   const [name, setName] = useState(nickname);
 
-  const hasSupabase = useMemo(() => Boolean(getSupabaseClient()), []);
+  const hasSupabase = Boolean(getSupabaseClient());
 
   const effectiveMode =
     preferredMode === "auto" ? (hasSupabase ? "online" : "local") : (preferredMode as "online" | "local");

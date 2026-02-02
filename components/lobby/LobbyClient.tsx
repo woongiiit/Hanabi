@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
 import { NightSky } from "@/components/NightSky";
 import { useProfileStore } from "@/store/profileStore";
 import { getSupabaseClient } from "@/lib/realtime/supabase";
 
 export function LobbyClient() {
   const { nickname, preferredMode } = useProfileStore();
-  const hasSupabase = useMemo(() => Boolean(getSupabaseClient()), []);
+  const hasSupabase = Boolean(getSupabaseClient());
   const mode = preferredMode === "auto" ? (hasSupabase ? "online" : "local") : preferredMode;
 
   return (
